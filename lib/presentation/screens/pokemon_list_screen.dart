@@ -19,6 +19,8 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
   bool isLoadingMore = false;
   bool isLoadingPrevious = false;
   String? _lastVisiblePokemonName;
+  bool _isSearching = false;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -48,38 +50,94 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: AppDrawer(),
       appBar: AppBar(
-        title: Text("Pokemons".toLowerCase().tr()),
+        title: _isSearching
+            ? _buildSearchField()
+            : Text("Pokemons".tr()),
+        actions: [
+          IconButton(
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
+            onPressed: () {
+              setState(() {
+                _isSearching = !_isSearching;
+                if (!_isSearching) {
+                  _searchController.clear();
+                  context.read<PokemonBloc>().add(GetPokemonsEvent());
+                }
+              });
+            },
+          ),
+        ],
       ),
-      body: BlocConsumer<PokemonBloc, PokemonState>(
-        listener: (context, state) {
-          if (state is PokemonLoaded) {
-            setState(() {
-              isLoadingMore = false;
-              isLoadingPrevious = false;
-            });
-            _scrollToSavedPosition(state);
-          }
-        },
-        builder: (context, state) {
-          if (state is PokemonLoading) {
-            return ListView.builder(
-              itemCount: 20,
-              itemBuilder: (context, index) => ShimmerPostWidget(),
-            );
-          } else if (state is PokemonLoaded) {
-            return _buildPokemonGrid(state);
-          } else if (state is PokemonError) {
-            return PokemonErrorWidget(message: state.message);
-          } else {
-            return Center(child: Text('Something went wrong.'.toLowerCase().tr()));
+      body: Column(
+        children: [
+          Expanded(
+            child: BlocConsumer<PokemonBloc, PokemonState>(
+              listener: (context, state) {
+                if (state is PokemonLoaded) {
+                  setState(() {
+                    isLoadingMore = false;
+                    isLoadingPrevious = false;
+                  });
+                  _scrollToSavedPosition(state);
+                }
+              },
+              builder: (context, state) {
+                if (state is PokemonLoading) {
+                  return ListView.builder(
+                    itemCount: 20,
+                    itemBuilder: (context, index) => ShimmerPostWidget(),
+                  );
+                } else if (state is PokemonLoaded) {
+                  return _buildPokemonGrid(state);
+                } else if (state is PokemonError) {
+                  return PokemonErrorWidget(message: state.message);
+                } else {
+                  return Center(child: Text('Something went wrong.'.toLowerCase().tr()));
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchField() {
+    return Container(
+      height: 40,
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: TextField(
+        controller: _searchController,
+        autofocus: true,
+        decoration: InputDecoration(
+          hintText: 'Search_Pokemon'.tr(),
+          border: InputBorder.none,
+          hintStyle: TextStyle(color: Colors.grey[600]),
+          prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
+          suffixIcon: IconButton(
+            icon: Icon(Icons.clear, color: Colors.grey[600]),
+            onPressed: () {
+              _searchController.clear();
+            },
+          ),
+          contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+        ),
+        style: TextStyle(color: Colors.black87),
+        onSubmitted: (value) {
+          if (value.isNotEmpty) {
+            context.read<PokemonBloc>().add(SearchPokemonEvent(value));
           }
         },
       ),

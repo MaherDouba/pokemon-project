@@ -19,6 +19,7 @@ import '../../domain/usecases/usecas_pokemon/get_scroll_position.dart';
 import '../../domain/usecases/usecas_pokemon/save_all_poemonname.dart';
 import '../../domain/usecases/usecas_pokemon/save_current_page.dart';
 import '../../domain/usecases/usecas_pokemon/save_scroll_position.dart';
+import '../../domain/usecases/usecas_pokemon/search_pokemons.dart';
 import '../../domain/usecases/usecases_language/get_current_language.dart';
 import '../../domain/usecases/usecases_language/save_language.dart';
 import '../../domain/usecases/usecases_theme/get_current_theme.dart';
@@ -40,7 +41,8 @@ Future<void> init() async {
     saveCurrentPage: sl(),
     getCurrentPage: sl(),
     saveAllPokemonNames: sl(),
-    getAllPokemonNames: sl()));
+    getAllPokemonNames: sl(),
+    searchPokemons: sl()));
   
   sl.registerFactory(() => LanguageBloc(getCurrentLanguage: sl(), saveLanguage: sl()));
   sl.registerFactory(() => ThemeBloc(getCurrentTheme: sl(), saveTheme: sl()));
@@ -53,6 +55,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetCurrentPage(sl()));
   sl.registerLazySingleton(() => SaveAllPokemonNames(sl()));
   sl.registerLazySingleton(() => GetAllPokemonNames(sl()));
+  sl.registerLazySingleton(() => SearchPokemons(sl()));
   
   // Use cases language 
   sl.registerLazySingleton(() => GetCurrentLanguage(sl()));

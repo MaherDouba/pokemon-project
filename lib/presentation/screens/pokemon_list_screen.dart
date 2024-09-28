@@ -125,9 +125,16 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
           hintText: 'Search_Pokemon'.tr(),
           border: InputBorder.none,
           hintStyle: TextStyle(color: Colors.grey[600]),
-          prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
+              prefixIcon: InkWell(
+      onTap: () {
+        if (_searchController.text.isNotEmpty) {
+          context.read<PokemonBloc>().add(SearchPokemonEvent(_searchController.text));
+        }
+      },
+      child: Icon(Icons.search, color: Colors.grey[600]),
+    ),
           suffixIcon: IconButton(
-            icon: Icon(Icons.clear, color: Colors.grey[600]),
+            icon: Icon(Icons.arrow_circle_left_outlined, color: Colors.grey[600]),
             onPressed: () {
               _searchController.clear();
             },

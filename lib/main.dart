@@ -7,6 +7,7 @@ import 'presentation/bloc/language_bloc/language_state.dart';
 import 'presentation/bloc/language_bloc/languge_bloc.dart';
 import 'presentation/bloc/pokemons_bloc/pokemon_bloc.dart';
 import 'presentation/bloc/theme_bloce/theme_bloc.dart';
+import 'presentation/bloc/theme_bloce/theme_event.dart';
 import 'presentation/bloc/theme_bloce/theme_state.dart';
 
 void main() async {
@@ -29,7 +30,13 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => di.sl<PokemonBloc>()),
-        BlocProvider(create: (context) => di.sl<ThemeBloc>()),
+        BlocProvider(
+          create: (context) {
+            final themeBloc = di.sl<ThemeBloc>();
+            themeBloc.add(GetThemeEvent());
+            return themeBloc;
+          },
+        ),
         BlocProvider(create: (context) => di.sl<LanguageBloc>()),
       ],
       child: BlocBuilder<ThemeBloc, ThemeState>(
@@ -49,7 +56,7 @@ class MyApp extends StatelessWidget {
                 locale: languageState is LanguageLoaded
                     ? Locale(languageState.languageCode)
                     : context.locale,
-                    onGenerateRoute: AppRouter.generateRoute,
+                onGenerateRoute: AppRouter.generateRoute,
                 initialRoute: '/',
               );
             },

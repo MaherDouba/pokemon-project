@@ -164,10 +164,11 @@ class PokemonBloc extends Bloc<PokemonEvent, PokemonState> {
           } else {
             _updateAllPokemonNames(pokemonList);
             emit(PokemonLoaded(
-              pokemons: currentState.pokemons + pokemonList,
+              pokemons:  [...currentState.pokemons, ...pokemonList],
               scrollPokemonName: null,
               hasReachedMax: false,
               currentPage: currentPage,
+              isLoadingMore: false,
             ));
           }
         },

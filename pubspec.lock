@@ -130,7 +130,7 @@ packages:
     source: hosted
     version: "4.0.0"
   cached_network_image_web:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: cached_network_image_web
       sha256: "205d6a9f1862de34b93184f22b9d2d94586b2f05c581d546695e3d8f6a805cd7"

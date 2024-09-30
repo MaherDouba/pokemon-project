@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../../core/animations/slide_fade_animation.dart';
 import '../../core/scroll_helper/visibility_detector.dart';
 import '../bloc/pokemons_bloc/pokemon_bloc.dart';
 import '../widgets/pokemon_error_widget.dart';
@@ -170,20 +171,23 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
             itemCount: state.hasReachedMax
                 ? state.pokemons.length
                 : state.pokemons.length + 1,
-            itemBuilder: (context, index) {
-              if (index < state.pokemons.length) {
-                final pokemon = state.pokemons[index];
-                return VisibilityDetector(
-                  key: Key(pokemon.name),
-                  onVisibilityChanged: (VisibilityInfo info) {
-                    if (info.visibleFraction > 0.5 &&
-                        _lastVisiblePokemonName != pokemon.name) {
-                      _lastVisiblePokemonName = pokemon.name;
-                      context.read<PokemonBloc>().add(SaveScrollPositionEvent(
-                            pokemonName: pokemon.name,
-                          ));
-                    }
-                  },
+itemBuilder: (context, index) {
+  if (index < state.pokemons.length) {
+    final pokemon = state.pokemons[index];
+    return SlideFadeAnimation(
+      duration: Duration(milliseconds: 1500),
+      begin: Offset(0, 0.5),
+      child: VisibilityDetector(
+        key: Key(pokemon.name),
+        onVisibilityChanged: (VisibilityInfo info) {
+          if (info.visibleFraction > 0.5 &&
+              _lastVisiblePokemonName != pokemon.name) {
+            _lastVisiblePokemonName = pokemon.name;
+            context.read<PokemonBloc>().add(SaveScrollPositionEvent(
+                  pokemonName: pokemon.name,
+                ));
+          }
+        },
                   child: PokemonCard(
                     pokemon: pokemon,
                     onTap: () => Navigator.push(
@@ -193,7 +197,7 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
                       ),
                     ),
                   ),
-                );
+     ) );
               } else {
                 return const Center(
                   child: Padding(
